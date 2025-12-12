@@ -2,7 +2,9 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/database";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDlDvuA4NCjQxfH2Z1wUI89jybVGzLZHBA",
+  // process.env.REACT_APP_ 접두사를 사용해야 Vercel의 빌드 시스템이 인식합니다.
+  apiKey: process.env.REACT_APP_API_KEY, 
+  authDomain: process.env.REACT_APP_AUTH_DOMAIN,
   authDomain: "memory-984c9.firebaseapp.com",
   projectId: "memory-984c9",
   storageBucket: "memory-984c9.firebasestorage.app",
