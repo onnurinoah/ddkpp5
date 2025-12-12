@@ -1,0 +1,65 @@
+/* 1. 게임 컨테이너: 전체 화면을 차지하도록 설정 */
+.game-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; /* 이모지가 밖으로 나가지 않도록 설정 */
+  background-color: #f0f0f0; /* 배경색 설정 (임시) */
+}
+
+/* 2. 떨어지는 이모지 스타일 및 최적화된 애니메이션 */
+.falling-emoji {
+  position: absolute;
+  top: -10vh; /* 화면 위에서 시작 */
+  font-size: 2em;
+  z-index: 10;
+  will-change: transform; /* GPU 가속 활성화 */
+  animation-name: fall;
+  animation-timing-function: linear;
+  /* animation-duration은 JS에서 설정 (4~6s) */
+}
+
+/* 3. 떨어지는 애니메이션 (top 대신 transform: translateY 사용!) */
+@keyframes fall {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(110vh) rotate(5deg); /* 화면 아래로 떨어지도록 */
+  }
+}
+
+/* 4. 상자 (Chest) 배치 및 스타일 */
+.chest-wrapper {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  padding-bottom: 20px;
+  z-index: 20;
+}
+
+.chest-placeholder {
+  font-size: 4em;
+  line-height: 1; /* 상자 이모지 */
+}
+
+/* 5. 하트 더미 스타일 */
+.heart-pile {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%); /* 중앙 정렬 */
+  display: flex;
+  flex-direction: column-reverse; /* 하트가 아래에서 위로 쌓이도록 */
+  align-items: center;
+}
+
+/* 6. 쌓이는 하트 스타일 (DOM 부하를 줄이기 위해 단순화) */
+.stacked-heart {
+  font-size: 1.5em;
+  line-height: 1;
+  /* 하트가 겹쳐 보이도록 마진을 조정 */
+  margin-bottom: -15px; 
+  will-change: transform;
+}
