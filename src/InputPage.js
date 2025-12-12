@@ -1,41 +1,65 @@
+// src/InputPage.js
 import React, { useState } from 'react';
 import { db } from './firebase';
+import firebase from 'firebase/compat/app';
+import './InputPage.css';
 
 const InputPage = () => {
   const [emoji, setEmoji] = useState('');
+  const [status, setStatus] = useState('default');
 
-  const sendEmoji = (e) => {
-    e.preventDefault();
-    if (!emoji || emoji.length > 2) return;
+  const sendEmoji = () => {
+    if (!emoji.trim()) return;
+    setStatus('loading');
 
     db.ref('inputs').push({
-      emoji: emoji,
-      timestamp: Date.now()
+      emoji: emoji.trim(),
+      timestamp: firebase.database.ServerValue.TIMESTAMP
+    }).then(() => {
+      setStatus('success');
+      setEmoji('');
+      setTimeout(() => setStatus('default'), 1500);
+    }).catch((err) => {
+      console.error(err);
+      alert('전송 실패');
+      setStatus('default');
     });
+  };
 
-    setEmoji('');
-    alert('🎉 이모지 전송 완료! 메인 화면을 확인하세요.');
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') sendEmoji();
   };
 
   return (
-    <div style={{ textAlign: 'center', padding: '50px', backgroundColor: '#f0f0f0', height: '100vh' }}>
-      <h1>QR코드 이벤트</h1>
-      <p style={{ fontSize: '1.2rem', marginBottom: '30px' }}>하나의 이모지를 입력해 주세요.</p>
-      <form onSubmit={sendEmoji}>
-        <input
-          value={emoji}
-          onChange={(e) => setEmoji(e.target.value)}
-          placeholder="여기에 이모지 입력 (예: 💎)"
-          maxLength="2"
-          style={{ fontSize: '3rem', padding: '10px', width: '80%', maxWidth: '300px', border: '2px solid #333' }}
-        />
-        <button
-          type="submit"
-          style={{ display: 'block', margin: '30px auto', padding: '15px 40px', fontSize: '1.5rem', cursor: 'pointer', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '8px' }}
+    <div className="input-page-wrapper">
+      <div className="input-container-box">
+        <h1>상자 채우기</h1>
+        <p>당신의 추억 이모지를 골라<br/>상자로 던져주세요!</p>
+        
+        <div className="input-group-styled">
+          <input 
+            type="text" 
+            className="emoji-input-styled"
+            placeholder="✨" 
+            maxLength="5"
+            value={emoji}
+            onChange={(e) => setEmoji(e.target.value)}
+            onKeyPress={handleKeyPress}
+            enterKeyHint="send"
+          />
+        </div>
+        
+        <button 
+          className={`send-btn-styled ${status === 'success' ? 'success' : ''}`}
+          onClick={sendEmoji}
+          disabled={status !== 'default'}
         >
-          보물상자로 보내기!
+          {status === 'loading' ? "보내는 중... 🔄" : 
+           status === 'success' ? "🎉 전송 성공!" : 
+           "상자로 던지기! 🚀"}
         </button>
-      </form>
+      </div>
+      <div className="page-footer">실시간 인터랙티브 이벤트</div>
     </div>
   );
 };

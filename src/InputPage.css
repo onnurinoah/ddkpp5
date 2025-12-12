@@ -5,20 +5,21 @@
   --bg-color: #f0f2f5;
 }
 
-.input-page-body {
+.input-page-wrapper {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--bg-color);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  height: 100vh; /* 모바일 대응 */
+  height: -webkit-fill-available;
   margin: 0;
   padding: 20px;
   box-sizing: border-box;
 }
 
-.input-container {
+.input-container-box {
   background: white;
   padding: 40px 30px;
   border-radius: 25px;
@@ -28,12 +29,12 @@
   text-align: center;
 }
 
-.input-container h1 { margin: 0 0 15px 0; font-size: 1.8rem; color: #333; }
-.input-container p { color: #666; margin-bottom: 30px; }
+.input-container-box h1 { margin: 0 0 15px 0; font-size: 1.8rem; color: #333; font-weight: 800; }
+.input-container-box p { color: #666; margin-bottom: 30px; line-height: 1.5; }
 
-.input-group { margin-bottom: 25px; }
+.input-group-styled { margin-bottom: 25px; }
 
-.emoji-input {
+.emoji-input-styled {
   width: 100%;
   padding: 15px;
   font-size: 3rem;
@@ -41,12 +42,13 @@
   border: 3px solid #eee;
   border-radius: 15px;
   box-sizing: border-box;
-  transition: border-color 0.3s;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background: #fafafa;
 }
 
-.emoji-input:focus { outline: none; border-color: var(--primary-color); }
+.emoji-input-styled:focus { outline: none; border-color: var(--primary-color); background: white; box-shadow: 0 0 0 4px rgba(255, 152, 0, 0.1); }
 
-.send-btn {
+.send-btn-styled {
   width: 100%;
   padding: 18px;
   font-size: 1.3rem;
@@ -55,13 +57,14 @@
   border: none;
   border-radius: 15px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   font-weight: 800;
   box-shadow: 0 4px 6px rgba(255, 152, 0, 0.2);
 }
 
-.send-btn:active { transform: scale(0.98); }
-.send-btn:disabled { background-color: #ccc; cursor: not-allowed; box-shadow: none; }
-.send-btn.success { background-color: var(--success-color); box-shadow: 0 4px 6px rgba(76, 175, 80, 0.3); }
+.send-btn-styled:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(255, 152, 0, 0.3); }
+.send-btn-styled:active { transform: scale(0.98); }
+.send-btn-styled:disabled { background-color: #ccc; cursor: not-allowed; box-shadow: none; transform: none; }
+.send-btn-styled.success { background-color: var(--success-color); box-shadow: 0 4px 6px rgba(76, 175, 80, 0.3); }
 
-.footer { margin-top: 30px; color: #aaa; font-size: 0.9rem; }
+.page-footer { margin-top: 30px; color: #aaa; font-size: 0.9rem; }
