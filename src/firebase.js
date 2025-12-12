@@ -2,19 +2,17 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/database";
 
 const firebaseConfig = {
-  // process.env.REACT_APP_ 접두사를 사용해야 Vercel의 빌드 시스템이 인식합니다.
   apiKey: process.env.REACT_APP_API_KEY, 
-  authDomain: process.env.REACT_APP_AUTH_DOMAIN,
-  authDomain: "memory-984c9.firebaseapp.com",
-  projectId: "memory-984c9",
-  storageBucket: "memory-984c9.firebasestorage.app",
-  messagingSenderId: "361490884024",
-  appId: "1:361490884024:web:b546dedbda87ca12555b4d",
-  measurementId: "G-YT8VY0THF1",
-  databaseURL: "https://memory-984c9-default-rtdb.firebaseio.com",
+  authDomain: process.env.REACT_APP_AUTH_DOMAIN, 
+  projectId: process.env.REACT_APP_PROJECT_ID, 
+  storageBucket: process.env.REACT_APP_STORAGE_BUCKET, 
+  messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_APP_ID,
+  measurementId: process.env.REACT_APP_MEASUREMENT_ID, 
+  databaseURL: process.env.REACT_APP_DATABASE_URL, 
 };
 
-if (!firebase.apps.length) {
+if (!firebase.apps.length && firebaseConfig.apiKey) {
   firebase.initializeApp(firebaseConfig);
 }
 
