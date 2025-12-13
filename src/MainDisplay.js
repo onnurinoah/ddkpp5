@@ -1,7 +1,9 @@
 import React, { useEffect, useRef } from 'react';
-// PixiJS v7은 보통 * as PIXI로 가져옵니다. (혹은 v7/v8 모두 호환되도록 명시적 import를 사용)
 import * as PIXI from 'pixi.js'; 
 import { db } from './firebase';
+
+// 🚨 파일 경로를 확인하세요. (예: src 폴더 안에 assets 폴더)
+import backgroundImage from './assets/IMG_4840.JPG'; 
 
 const MainDisplay = () => {
   const canvasContainerRef = useRef(null); 
@@ -9,18 +11,16 @@ const MainDisplay = () => {
   const appRef = useRef(null);
   const textureCacheRef = useRef({}); 
 
-  // v7에서는 async/await 초기화가 필요 없으며, useEffect가 곧바로 동기적으로 실행됩니다.
   useEffect(() => {
     
     // --- 1. PixiJS v7 초기화 (동기) ---
     const WIDTH = 1280;
     const HEIGHT = 720;
 
-    // 🚨 v7 스타일: 생성자 함수에 옵션을 직접 넣습니다. init() 호출 없음
     const app = new PIXI.Application({
       width: WIDTH,
       height: HEIGHT,
-      background: '#000000', // v7은 background 사용 (v8은 backgroundColor)
+      background: '#000000', 
       antialias: true,
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
@@ -33,11 +33,11 @@ const MainDisplay = () => {
       canvasContainerRef.current.appendChild(app.view);
     }
 
-    // --- 배경 및 레이어 설정 ---
-    const background = new PIXI.Graphics();
-    background.beginRadialFill([0x512b58, 0x2c1055, 0x000000], [0, 0.4, 1], WIDTH / 2, HEIGHT, HEIGHT * 0.8);
-    background.drawRect(0, 0, WIDTH, HEIGHT);
-    background.endFill();
+    // --- 배경 이미지 설정 ---
+    const backgroundTexture = PIXI.Texture.from(backgroundImage);
+    const background = new PIXI.Sprite(backgroundTexture);
+    background.width = WIDTH;
+    background.height = HEIGHT;
     app.stage.addChild(background);
 
     // 쌓이는 레이어
@@ -58,7 +58,7 @@ const MainDisplay = () => {
     const MAX_EMOJIS = 1500;
     const BASE_SCALE = 0.35; 
 
-    // --- 텍스처 캐싱 함수 (v7 호환) ---
+    // --- 텍스처 캐싱 함수 ---
     const getCachedTexture = (char) => {
       if (textureCacheRef.current[char]) return textureCacheRef.current[char];
       
@@ -69,7 +69,6 @@ const MainDisplay = () => {
       });
       const text = new PIXI.Text(char, style);
       
-      // v7 텍스처 생성 방식
       const texture = app.renderer.generateTexture(text, { resolution: 2, scaleMode: PIXI.SCALE_MODES.LINEAR });
       textureCacheRef.current[char] = texture;
       text.destroy(); 
@@ -78,7 +77,7 @@ const MainDisplay = () => {
 
     const heartTexture = getCachedTexture('❤️');
 
-    // --- 2. 이모지 생성 함수 (효과 유지) ---
+    // --- 2. 이모지 생성 함수 ---
     const createEmojiSprite = (emojiChar) => {
       const texture = getCachedTexture(emojiChar);
       const sprite = new PIXI.Sprite(texture);
@@ -91,7 +90,7 @@ const MainDisplay = () => {
       sprite.targetScale = BASE_SCALE * (0.9 + Math.random() * 0.3); 
 
       // 물리 및 상태 속성
-      sprite.state = 'flying'; // 'flying' | 'landing_squash' | 'landed'
+      sprite.state = 'flying'; 
       sprite.rotationSpeed = (Math.random() - 0.5) * 0.2;
       
       const range = 280; 
@@ -122,9 +121,8 @@ const MainDisplay = () => {
     inputRef.on('child_added', onChildAdded);
 
     // --- 4. 애니메이션 루프 (Ticker) ---
-    app.ticker.add((delta) => { // v7/v8 모두 delta 인자는 호환됩니다.
+    app.ticker.add((delta) => {
         
-      // 큐 처리 (한번에 최대 4개)
       let count = 0;
       while (incomingQueue.current.length > 0 && count < 4) {
         createEmojiSprite(incomingQueue.current.shift());
@@ -132,7 +130,7 @@ const MainDisplay = () => {
       }
 
       let needsSort = false;
-      const tickerDelta = app.ticker.deltaTime; // 틱당 프레임 시간에 기반한 Delta
+      const tickerDelta = app.ticker.deltaTime; 
 
       // 이모지 업데이트
       for (let i = activeEmojis.length - 1; i >= 0; i--) {
@@ -200,7 +198,7 @@ const MainDisplay = () => {
 
     // 반응형 처리
     const handleResize = () => {
-      if (canvasContainerRef.current && app.view) { // v7은 app.view
+      if (canvasContainerRef.current && app.view) {
         const parent = canvasContainerRef.current;
         const scale = Math.min(parent.clientWidth / WIDTH, parent.clientHeight / HEIGHT);
         app.view.style.width = `${WIDTH * scale}px`;
