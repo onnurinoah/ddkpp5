@@ -20,6 +20,11 @@ const MainDisplay = () => {
   const FINAL_X_RANGE = 700;  // 최종 착지 영역의 x축 범위 (화면을 넓게 사용)
   const LANDING_Y_START = 0.65; // 착지 영역이 시작되는 y축 비율 (화면 중앙 하단)
   
+  // 🚨 [새로운 설정] 속도와 처리량 관련 상수
+  const FLIGHT_DURATION_FRAMES = 120; // 비행 시간: 60 -> 120 프레임 (약 2초)로 두 배 느리게
+  const MAX_EMOJIS_PER_TICK = 10;   // 틱당 처리 이모지 수: 4 -> 10으로 증가 (실시간 처리량 개선)
+  const GRAVITY = 0.3;              // 중력 감소 (0.5 -> 0.3)로 더 부드럽게 상승/하강
+  
   useEffect(() => {
     
     // --- 1. PixiJS v7 초기화 (동기) ---
@@ -54,16 +59,6 @@ const MainDisplay = () => {
     pileLayer.sortableChildren = true; 
     app.stage.addChild(pileLayer);
 
-    // 🚨 🎁 상자 이모지 제거됨
-    /* const chestStyle = new PIXI.TextStyle({ fontSize: 130 });
-    const chest = new PIXI.Text('🎁', chestStyle);
-    chest.anchor.set(0.5);
-    chest.x = WIDTH / 2;
-    chest.y = HEIGHT * 0.72;
-    chest.zIndex = 99999; 
-    pileLayer.addChild(chest);
-    */
-
     const activeEmojis = [];
     const MAX_EMOJIS = 1500;
     const BASE_SCALE = 0.35; 
@@ -94,9 +89,9 @@ const MainDisplay = () => {
       
       sprite.anchor.set(0.5);
       
-      // 🚨 [포물선 확장] 시작 위치 변경: 화면 하단 중앙에서 발사
-      sprite.x = WIDTH / 2 + (Math.random()-0.5) * 80; // 80px 폭
-      sprite.y = HEIGHT * START_Y_RATIO; // 화면 하단 85% 지점
+      // 시작 위치
+      sprite.x = WIDTH / 2 + (Math.random()-0.5) * 80; 
+      sprite.y = HEIGHT * START_Y_RATIO; 
 
       sprite.scale.set(0); 
       sprite.targetScale = BASE_SCALE * (0.9 + Math.random() * 0.3); 
@@ -105,17 +100,19 @@ const MainDisplay = () => {
       sprite.state = 'flying'; 
       sprite.rotationSpeed = (Math.random() - 0.5) * 0.2;
       
-      // 🚨 [착지 영역 변경] 도착 위치 변경: 화면 중앙~하단 넓은 영역
-      sprite.finalX = (WIDTH / 2) + (Math.random() - 0.5) * FINAL_X_RANGE; // X축 넓게 사용
-      sprite.finalY = (HEIGHT * LANDING_Y_START) + (Math.random() * FINAL_Y_RANGE); // Y축 넓게 사용
-      sprite.zIndex = Math.floor(sprite.finalY); // Y축 기준으로 Z-Index 설정
+      // 도착 위치
+      sprite.finalX = (WIDTH / 2) + (Math.random() - 0.5) * FINAL_X_RANGE; 
+      sprite.finalY = (HEIGHT * LANDING_Y_START) + (Math.random() * FINAL_Y_RANGE); 
+      sprite.zIndex = Math.floor(sprite.finalY); 
 
-      // 발사 속도 계산
-      const duration = 60; // 비행 시간 (60 틱 = 약 1초)
+      // 🚨 [속도 변경] 비행 시간을 새로운 상수로 설정
+      const duration = FLIGHT_DURATION_FRAMES; 
       sprite.vx = (sprite.finalX - sprite.x) / duration;
-      sprite.gravity = 0.5;
       
-      // 🚨 [포물선 확장] V0y 계산: 발사 위치와 도착 위치의 차이를 커버하도록 계산
+      // 🚨 [속도 변경] 중력을 새로운 상수로 설정
+      sprite.gravity = GRAVITY;
+      
+      // V0y 계산
       sprite.vy = (sprite.finalY - sprite.y - 0.5 * sprite.gravity * duration * duration) / duration;
 
       pileLayer.addChild(sprite);
@@ -137,8 +134,9 @@ const MainDisplay = () => {
     // --- 4. 애니메이션 루프 (Ticker) ---
     app.ticker.add((delta) => {
         
+      // 🚨 [실시간 처리량 증가] 틱당 처리하는 이모지 수를 증가
       let count = 0;
-      while (incomingQueue.current.length > 0 && count < 4) {
+      while (incomingQueue.current.length > 0 && count < MAX_EMOJIS_PER_TICK) {
         createEmojiSprite(incomingQueue.current.shift());
         count++;
       }
