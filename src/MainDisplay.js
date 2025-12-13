@@ -11,7 +11,7 @@ const MainDisplay = () => {
   const appRef = useRef(null);
   const textureCacheRef = useRef({}); 
   
-  // 🚨 이모지 입력 페이지의 QR 코드 이미지 경로 (public 폴더를 가정합니다)
+  // 🚨 이모지 입력 페이지의 QR 코드 이미지 경로 (이 변수는 사용되지 않지만 정의는 남겨둡니다)
   const QR_IMAGE_PATH = '/assets/input_qr.png';
   
   // 🚨 이모지 발사 위치와 착지 영역 설정을 위한 변수
@@ -241,34 +241,7 @@ const MainDisplay = () => {
         overflow: 'hidden',
         position: 'relative'
       }}
-    >
-      {/* 🚨 [QR 코드 추가] 화면 우측 상단에 QR 코드를 오버레이합니다. */}
-      <div 
-        style={{
-          position: 'absolute',
-          top: '20px',
-          right: '20px',
-          padding: '10px',
-          background: 'rgba(255, 255, 255, 0.9)', // 흰색 배경으로 가독성 확보
-          borderRadius: '8px',
-          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
-          zIndex: 100 // 캔버스 위에 표시되도록 z-index를 높입니다.
-        }}
-      >
-        <img 
-          src={QR_IMAGE_PATH} 
-          alt="Emoji Input QR Code"
-          style={{ 
-            width: '120px', // QR 코드 크기 설정
-            height: '120px',
-            display: 'block'
-          }}
-        />
-        <p style={{ margin: '5px 0 0', textAlign: 'center', fontSize: '12px', color: '#333' }}>
-          이모지 입력
-        </p>
-      </div>
-    </div>
+    />
   );
 };
 
