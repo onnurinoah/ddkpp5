@@ -10,7 +10,16 @@ const MainDisplay = () => {
   const incomingQueue = useRef([]);
   const appRef = useRef(null);
   const textureCacheRef = useRef({}); 
-
+  
+  // 🚨 이모지 입력 페이지의 QR 코드 이미지 경로 (public 폴더를 가정합니다)
+  const QR_IMAGE_PATH = '/assets/input_qr.png';
+  
+  // 🚨 이모지 발사 위치와 착지 영역 설정을 위한 변수
+  const START_Y_RATIO = 0.85; // 이모지가 시작되는 y축 비율 (화면 하단)
+  const FINAL_Y_RANGE = 180;  // 최종 착지 영역의 y축 범위 (더 넓게)
+  const FINAL_X_RANGE = 700;  // 최종 착지 영역의 x축 범위 (화면을 넓게 사용)
+  const LANDING_Y_START = 0.65; // 착지 영역이 시작되는 y축 비율 (화면 중앙 하단)
+  
   useEffect(() => {
     
     // --- 1. PixiJS v7 초기화 (동기) ---
@@ -45,14 +54,15 @@ const MainDisplay = () => {
     pileLayer.sortableChildren = true; 
     app.stage.addChild(pileLayer);
 
-    // 상자
-    const chestStyle = new PIXI.TextStyle({ fontSize: 130 });
+    // 🚨 🎁 상자 이모지 제거됨
+    /* const chestStyle = new PIXI.TextStyle({ fontSize: 130 });
     const chest = new PIXI.Text('🎁', chestStyle);
     chest.anchor.set(0.5);
     chest.x = WIDTH / 2;
     chest.y = HEIGHT * 0.72;
     chest.zIndex = 99999; 
     pileLayer.addChild(chest);
+    */
 
     const activeEmojis = [];
     const MAX_EMOJIS = 1500;
@@ -83,8 +93,10 @@ const MainDisplay = () => {
       const sprite = new PIXI.Sprite(texture);
       
       sprite.anchor.set(0.5);
-      sprite.x = WIDTH / 2 + (Math.random()-0.5) * 40; 
-      sprite.y = HEIGHT * 0.68; 
+      
+      // 🚨 [포물선 확장] 시작 위치 변경: 화면 하단 중앙에서 발사
+      sprite.x = WIDTH / 2 + (Math.random()-0.5) * 80; // 80px 폭
+      sprite.y = HEIGHT * START_Y_RATIO; // 화면 하단 85% 지점
 
       sprite.scale.set(0); 
       sprite.targetScale = BASE_SCALE * (0.9 + Math.random() * 0.3); 
@@ -93,15 +105,17 @@ const MainDisplay = () => {
       sprite.state = 'flying'; 
       sprite.rotationSpeed = (Math.random() - 0.5) * 0.2;
       
-      const range = 280; 
-      sprite.finalX = (WIDTH / 2) + (Math.random() - 0.5) * range;
-      sprite.finalY = (HEIGHT * 0.78) + (Math.random() * 80); 
-      sprite.zIndex = Math.floor(sprite.finalY); 
+      // 🚨 [착지 영역 변경] 도착 위치 변경: 화면 중앙~하단 넓은 영역
+      sprite.finalX = (WIDTH / 2) + (Math.random() - 0.5) * FINAL_X_RANGE; // X축 넓게 사용
+      sprite.finalY = (HEIGHT * LANDING_Y_START) + (Math.random() * FINAL_Y_RANGE); // Y축 넓게 사용
+      sprite.zIndex = Math.floor(sprite.finalY); // Y축 기준으로 Z-Index 설정
 
       // 발사 속도 계산
-      const duration = 60; 
+      const duration = 60; // 비행 시간 (60 틱 = 약 1초)
       sprite.vx = (sprite.finalX - sprite.x) / duration;
       sprite.gravity = 0.5;
+      
+      // 🚨 [포물선 확장] V0y 계산: 발사 위치와 도착 위치의 차이를 커버하도록 계산
       sprite.vy = (sprite.finalY - sprite.y - 0.5 * sprite.gravity * duration * duration) / duration;
 
       pileLayer.addChild(sprite);
@@ -229,7 +243,34 @@ const MainDisplay = () => {
         overflow: 'hidden',
         position: 'relative'
       }}
-    />
+    >
+      {/* 🚨 [QR 코드 추가] 화면 우측 상단에 QR 코드를 오버레이합니다. */}
+      <div 
+        style={{
+          position: 'absolute',
+          top: '20px',
+          right: '20px',
+          padding: '10px',
+          background: 'rgba(255, 255, 255, 0.9)', // 흰색 배경으로 가독성 확보
+          borderRadius: '8px',
+          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+          zIndex: 100 // 캔버스 위에 표시되도록 z-index를 높입니다.
+        }}
+      >
+        <img 
+          src={QR_IMAGE_PATH} 
+          alt="Emoji Input QR Code"
+          style={{ 
+            width: '120px', // QR 코드 크기 설정
+            height: '120px',
+            display: 'block'
+          }}
+        />
+        <p style={{ margin: '5px 0 0', textAlign: 'center', fontSize: '12px', color: '#333' }}>
+          이모지 입력
+        </p>
+      </div>
+    </div>
   );
 };
 
