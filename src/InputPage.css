@@ -27,6 +27,7 @@
   width: 100%;
   max-width: 400px;
   text-align: center;
+  position: relative; /* 토스트 메시지와의 상대적 위치는 필요 없지만 구조상 유지 */
 }
 
 .input-container-box h1 { margin: 0 0 15px 0; font-size: 1.8rem; color: #333; font-weight: 800; }
@@ -68,3 +69,33 @@
 .send-btn-styled.success { background-color: var(--success-color); box-shadow: 0 4px 6px rgba(76, 175, 80, 0.3); }
 
 .page-footer { margin-top: 30px; color: #aaa; font-size: 0.9rem; }
+
+
+/* ⭐ [추가] 토스트 메시지 스타일 */
+.toast-message-styled {
+  position: fixed;
+  bottom: 50px; /* 화면 하단에서 띄움 */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(51, 51, 51, 0.9); /* 어두운 배경 */
+  color: white;
+  padding: 12px 25px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  z-index: 1000; /* 다른 요소 위에 표시 */
+  /* 애니메이션 추가 */
+  opacity: 0;
+  animation: fadeIn 0.3s forwards, fadeOut 0.3s 1.2s forwards;
+  pointer-events: none; /* 클릭 이벤트 방지 */
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translate(-50%, 20px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translate(-50%, 0); }
+  to { opacity: 0; transform: translate(-50%, -20px); }
+}
